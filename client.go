@@ -188,6 +188,7 @@ func (c *Client) GetDeviceName(d members.Device) (string, error) {
 }
 
 func (c *Client) GetDeviceState(d members.Device) (members.DeviceState, error) {
+	// TODO
 	return 0, errors.New("not implemented")
 }
 
