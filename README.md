@@ -20,4 +20,4 @@ Key differences:
 
 ## Contributing
 
-There are still lots of things you can improve, PRs and issues are welcome.
+There are still lots of things you can improve. You may just search for "TODO" if you want an idea on what needs to be improved. PRs and issues are welcome.
