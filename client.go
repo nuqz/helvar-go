@@ -20,6 +20,7 @@ type Client struct {
 	hostParts []string
 	port      int
 	address   string
+	connected bool
 
 	toSend chan<- *chanfan.IO[*message.Message, *message.Message]
 }
@@ -60,12 +61,20 @@ func (c *Client) Connect(nTransceivers, bufSize int) ([]<-chan error, error) {
 		errs[i] = NewTransceiver(conn, in).Go()
 	}
 
+	c.connected = true
 	return errs, nil
 }
 
-func (c *Client) Disconnect() { close(c.toSend) }
+func (c *Client) Disconnect() {
+	close(c.toSend)
+	c.connected = false
+}
 
 func (c *Client) Transceive(msg *message.Message) (*message.Message, error) {
+	if !c.connected {
+		return nil, errors.Errorf("client is not connected: %s", c.address)
+	}
+
 	ret := make(chan *chanfan.Result[*message.Message])
 	c.toSend <- chanfan.NewIO(msg, ret)
 	resp := <-ret

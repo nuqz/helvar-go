@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/nuqz/chanfan"
+	"github.com/nuqz/helvar-go/message"
 	ht "github.com/nuqz/helvar-go/testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -20,6 +21,9 @@ func TestClient(t *testing.T) {
 	require.NoError(t, fakeSrv.Listen())
 
 	client := NewClient("localhost", fakeSrvPort)
+	_, err := client.Transceive(message.NewQueryTime())
+	assert.Error(t, err)
+
 	errs, err := client.Connect(4, 4)
 	require.NoError(t, err)
 
@@ -103,4 +107,7 @@ func TestClient(t *testing.T) {
 
 	wg.Wait()
 	client.Disconnect()
+
+	_, err = client.Transceive(message.NewQueryTime())
+	assert.Error(t, err)
 }
