@@ -5,7 +5,7 @@ package members
 type DeviceState int64
 
 const (
-	OK DeviceState = 0x00000000
+	DeviceOK DeviceState = 0x00000000
 
 	// NSDisabled - device or subdevice has been disabled, usually an IR
 	// subdevice or a DMX channel.
@@ -132,9 +132,9 @@ const (
 
 // Device represents a device as defined in HelvarNET protocol.
 type Device struct {
-	Address string
-	Name    string
-	State   DeviceState
+	Address string      `yaml:"address"`
+	Name    string      `yaml:"name"`
+	State   DeviceState `yaml:"state"`
 }
 
 // TODO: shortcuts for state checks: IsXxx() bool { ... }

@@ -9,76 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nuqz/helvar-go/members"
 	"github.com/nuqz/helvar-go/message"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/constraints"
 )
-
-type Network struct {
-	Clusters []members.Cluster
-	Routers  []members.Router
-	Groups   []members.Group
-}
-
-func (n Network) GetClusterIDs() []uint8 {
-	out := make([]uint8, len(n.Clusters))
-	for i, c := range n.Clusters {
-		out[i] = c.ID
-	}
-
-	return out
-}
-
-func (n Network) GetRouterIDs() []uint8 {
-	out := make([]uint8, len(n.Routers))
-	for i, r := range n.Routers {
-		out[i] = r.ID
-	}
-
-	return out
-}
-
-func (n Network) GetGroupIDs() []uint16 {
-	out := make([]uint16, len(n.Groups))
-	for i, g := range n.Groups {
-		out[i] = g.ID
-	}
-
-	return out
-}
-
-func (n Network) GetGroupByID(id uint16) members.Group {
-	for _, g := range n.Groups {
-		if g.ID == id {
-			return g
-		}
-	}
-
-	return members.Group{}
-}
-
-func (n Network) GetGroupDevices(id uint16) []string {
-	g := n.GetGroupByID(id)
-	out := make([]string, len(g.Devices))
-	for i, d := range g.Devices {
-		out[i] = "@" + d.Address
-	}
-
-	return out
-}
-
-func (n Network) GetDeviceByAddress(addr string) members.Device {
-	for _, g := range n.Groups {
-		for _, d := range g.Devices {
-			if d.Address == addr {
-				return d
-			}
-		}
-	}
-
-	return members.Device{}
-}
 
 func toStrs[T constraints.Integer](in []T) []string {
 	out := make([]string, len(in))
@@ -95,38 +29,6 @@ func joinIDs[T constraints.Integer](ids []T) string {
 
 func joinStrs(strs []string) string {
 	return strings.Join(strs, message.Delimiter.String())
-}
-
-// Net is virtual HelvarNET network for testing purpose.
-var Net = Network{
-	Clusters: []members.Cluster{{ID: 1}, {ID: 2}, {ID: 3}},
-	Routers:  []members.Router{{ID: 251}, {ID: 252}, {ID: 253}},
-	Groups: []members.Group{
-		{
-			ID:        11,
-			Name:      "Group 11",
-			LastScene: 0,
-			Devices: []members.Device{
-				{Address: "1.251.1", Name: "Lamp 1 in Group 11", State: members.OK},
-			},
-		},
-		{
-			ID:        12,
-			Name:      "Group 12",
-			LastScene: 0,
-			Devices: []members.Device{
-				{Address: "1.252.1", Name: "Lamp 1 in Group 12", State: members.OK},
-			},
-		},
-		{
-			ID:        13,
-			Name:      "Group 13",
-			LastScene: 0,
-			Devices: []members.Device{
-				{Address: "1.253.1", Name: "Lamp 1 in Group 13", State: members.OK},
-			},
-		},
-	},
 }
 
 type Router struct {
@@ -245,17 +147,17 @@ func (r *Router) handleClient(conn net.Conn) error {
 
 		switch cmdID {
 		case message.QueryClusters:
-			reply.Answer = joinIDs(Net.GetClusterIDs())
+			reply.Answer = joinIDs(r.net.GetClusterIDs())
 		case message.QueryRouters:
-			reply.Answer = joinIDs(Net.GetRouterIDs())
+			reply.Answer = joinIDs(r.net.GetRouterIDs())
 		case message.QueryGroups:
-			reply.Answer = joinIDs(Net.GetGroupIDs())
+			reply.Answer = joinIDs(r.net.GetGroupIDs())
 		case message.QueryGroupDescription:
-			reply.Answer = Net.GetGroupByID(msg.GetGroupID()).Name
+			reply.Answer = r.net.GetGroupByID(msg.GetGroupID()).Name
 		case message.QueryGroup:
-			reply.Answer = joinStrs(Net.GetGroupDevices(msg.GetGroupID()))
+			reply.Answer = joinStrs(r.net.GetGroupDevices(msg.GetGroupID()))
 		case message.QueryDeviceDescription:
-			reply.Answer = Net.GetDeviceByAddress(msg.GetAddress()).Name
+			reply.Answer = r.net.GetDeviceByAddress(msg.GetAddress()).Name
 		case message.QueryTime:
 			reply.Answer = strconv.Itoa(int(time.Now().Unix()))
 		case message.NoCommand:

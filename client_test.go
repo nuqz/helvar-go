@@ -2,6 +2,7 @@ package helvargo
 
 import (
 	"fmt"
+	"path"
 	"sync"
 	"testing"
 
@@ -17,7 +18,8 @@ var (
 )
 
 func TestClient(t *testing.T) {
-	fakeSrv := ht.NewRouter(fmt.Sprintf(":%d", fakeSrvPort), ht.Net)
+	defaultNet := ht.MustNetFromYAMLFile(path.Join("testing", "test_net.yml"))
+	fakeSrv := ht.NewRouter(fmt.Sprintf(":%d", fakeSrvPort), defaultNet)
 	require.NoError(t, fakeSrv.Listen())
 
 	client := NewClient("localhost", fakeSrvPort)
@@ -39,7 +41,7 @@ func TestClient(t *testing.T) {
 		clusters, err := client.GetClusters()
 		require.NoError(t, err)
 
-		for _, expected := range ht.Net.Clusters {
+		for _, expected := range defaultNet.Clusters {
 			found := false
 			for _, actual := range clusters {
 				found = actual.ID == expected.ID
@@ -56,7 +58,7 @@ func TestClient(t *testing.T) {
 		routers, err := client.GetRouters()
 		require.NoError(t, err)
 
-		for _, expected := range ht.Net.Routers {
+		for _, expected := range defaultNet.Routers {
 			found := false
 			for _, actual := range routers {
 				found = actual.ID == expected.ID

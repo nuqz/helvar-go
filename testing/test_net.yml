@@ -1,0 +1,30 @@
+clusters:
+  - id: 1
+  - id: 2
+  - id: 3
+
+routers:
+  - id: 251
+  - id: 252
+  - id: 253
+
+groups:
+  - id: 11
+    name: Group 11
+    last_scene: 0
+    devices:
+      - address: 1.251.1
+        name: Lamp 1 in Group 11
+        state: 0
+
+  - id: 12
+    name: Group 12
+    devices:
+      - address: 1.252.1
+        name: Lamp 1 in Group 12
+  
+  - id: 12
+    name: Group 13
+    devices:
+      - address: 1.253.1
+        name: Lamp 1 in Group 13

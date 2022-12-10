@@ -4,12 +4,12 @@ package members
 type Group struct {
 	// ID is uint16, however HelvarNET protocol assumes it is within
 	// [1..16383] range.
-	ID   uint16
-	Name string
+	ID   uint16 `yaml:"id"`
+	Name string `yaml:"name"`
 
 	// Last scene is uint8, however HelvarNET protocol assumes it is within
 	// [1..16] range.
-	LastScene uint8
+	LastScene uint8 `yaml:"last_scene"`
 
-	Devices []Device
+	Devices []Device `yaml:"devices"`
 }
